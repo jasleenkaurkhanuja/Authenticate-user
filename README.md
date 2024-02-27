@@ -1,24 +1,19 @@
-# README
+# Description:
+This is an API-only social media application, where following tasks could be performed:
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+* User can signup using email, password, name and phone number.
 
-Things you may want to cover:
+* User can login using email and password.
 
-* Ruby version
+* Reset the password if forgotten or for safety purposes by getting an email with the otp to update the password.
 
-* System dependencies
+* User can create, update and delete many posts.
 
-* Configuration
+* Users Can comment and like the on the posts.
 
-* Database creation
+* Users can like the comments as well.
 
-* Database initialization
+* Can send friend requests to other users.
 
-* How to run the test suite
+* The posts have 3 different privacy levels: only_me, my_friends and everyone.
 
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
