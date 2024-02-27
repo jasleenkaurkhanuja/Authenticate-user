@@ -37,9 +37,18 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
+  # config.action_mailer.raise_delivery_errors = false
 
+  # config.action_mailer.perform_caching = false
+
+  
+
+  config.action_mailer.raise_delivery_errors = true
+  # config.action_mailer.delivery_method = :letter_opener
+  config.action_mailer.perform_deliveries = true
   config.action_mailer.perform_caching = false
+
+
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -73,4 +82,18 @@ Rails.application.configure do
 
   # Raise error when a before_action's only/except options reference missing actions
   config.action_controller.raise_on_missing_callback_actions = true
+  config.action_mailer.default_options = {
+    from: 'personaluse24032002@gmail.com' # Replace with your default "from" email address
+  }
+    # Highlight code that enqueued background job in logs.
+    config.active_job.verbose_enqueue_logs = true
+    config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: 'smtp.gmail.com',
+    port: 587,
+    user_name: 'personaluse24032002@gmail.com',
+    password: 'rrjftaiccjytwaqp',
+    authentication: 'plain',
+    enable_starttls_auto: true
+  }
 end

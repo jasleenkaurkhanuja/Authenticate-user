@@ -43,6 +43,7 @@ class UsersController < ApplicationController
     render json: {user: @user}
   end
 
+
   def delete 
     @user = @current_user 
     if @user.destroy
