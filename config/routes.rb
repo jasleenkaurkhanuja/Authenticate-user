@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+
+  post '/verify', to:'users#verify'
   post '/forgot_password', to: 'passwords#forgot'
   post '/reset', to: 'passwords#reset'
   get "/show_notifications", to:'notifications#show'
