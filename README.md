@@ -1,6 +1,6 @@
-<!-- # Description:
+# Description:
 This is an API-only social media application, where following tasks could be performed:
-
+<!--
 * User can signup using email, password, name and phone number.
 
 * User can login using email and password.
@@ -29,9 +29,9 @@ This is an API-only social media application, where following tasks could be per
 * [x] 3. Account update using authorisation token 
   * [ ] 3.1 Refresh token concept incase of token gets expire (learn and implement)
 * [x] 4. Create, update and delete Post  
-  * [x] 4.1 Read all post and add pagination  
-  * [ x] 4.2  Comments (CRUD) on post
-  * [ x] 4.3 Like and unlike  on Posts and comments (use polymorphic association)
+  * [ ] 4.1 Read all post and add pagination  
+  * [x] 4.2  Comments (CRUD) on post
+  * [x] 4.3 Like and unlike  on Posts and comments (use polymorphic association)
   * [x] 4.4 seprate api for getting all likes on post and comments 
 * [x] 5. Add friends - request would be in pending, accepted and decline
   * [ ] 5.1  if decline can send friend request again after 30days
