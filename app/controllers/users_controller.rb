@@ -39,16 +39,31 @@ class UsersController < ApplicationController
 
   def login
     @user = User.find_by_email(params[:user][:email])
-    if @user.verfication.eq('false') 
+    if @user.verification == 'false'
       render json: {message: 'Account not verified, please check your email for the verfication'}
-    end
-    if @user && @user.authenticate(params[:user][:password])
-      token = JsonWebToken.encode(user_id: @user.id)
-      render json: {name: @user.name, token:token}
+    elsif @user && @user.authenticate(params[:user][:password])
+      access_token = JsonWebToken.encode(user_id: @user.id)
+      refresh_token = JsonWebToken.encode(user_id: @user.id, exp: 6.months.from_now)
+      render json: {name: @user.name, access_token:token, refresh_token}
     else 
       render json: {error: @user.errors.full_messages}, status: :unprocessable_entity 
     end
+end
+
+def refresh 
+  @decoded_token = JsonWebToken.decode(params[:refresh_token])
+  if @decode_token && @decoded_token["user_id"]
+    @user = User.find(@decode_token["user_id"])
+    if @decode_token["exp"] >= Time.now.to_i 
+      @access_token = JsonWebToken.encode(user_id: @user.id)
+      render json: {message: "refresh token generated"}, status: :ok 
+    else 
+      render json: {message: "refresh_token expired"}, status: :unprocessable_entity
+    end
+  else 
+    render json: {message: "Invalid refresh token"}, status: :unprocessable_entity
   end
+end
 
   def logout
     render json:{message:"The user is successfully logged out"}

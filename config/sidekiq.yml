@@ -1,0 +1,5 @@
+
+:schedule:
+  destroy_old_friendships:
+    cron: '* * * * *' # Run at every minute
+    class: DestroyOldFriendshipsWorker

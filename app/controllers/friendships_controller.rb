@@ -4,7 +4,7 @@ class FriendshipsController < ApplicationController
     @friend = User.find(params[:id])
     # byebug
     @check = Friendship.find_by(sender_id: @current_user.id, reciever_id: @friend.id)
-    byebug
+    # byebug
     # @friendship = Friendship.create(sender_id: @current_user.id, reciever_id: @friend.id, status:'pending')
     # Check if the friendship already exists
     if @check
@@ -12,8 +12,21 @@ class FriendshipsController < ApplicationController
         render json: {message: "Already friends"}
       elsif @check.status == 'pending'
         render json: {message: "Friend request already in queue"}
-      else 
-        render json: {message: "Some error occured"}
+      elsif @check.status == 'declined' && @check.created_at > 30.days.ago
+        render json: {message: 'Friend request not sent(cool off period)'}
+      elsif @check.status == 'declined' && @check.created_at <= 30.days.ago
+        @check.destroy 
+        @friendship = Friendship.create(sender_id: @current_user.id, reciever_id: @friend.id, status: "pending")
+        @notification = Notification.create(sender_id: @current_user.id, reciever_id: @friend.id)
+        if @friendship.save 
+          if @notification.save 
+            render json: {message: "Friend request sent"}
+          else 
+            render json: {message: "An error occured"}
+          end
+        else 
+          render json: {message: "Friend request not sent"}
+        end
       end
     else
       @friendship = Friendship.create(sender_id: @current_user.id, reciever_id: @friend.id, status:'pending')
@@ -30,8 +43,8 @@ class FriendshipsController < ApplicationController
 
   def friends 
     @user = @current_user
-    # @friendships = Friendship.all
-    @friendships = Friendship.where(status: 'accepted', reciever_id: @user.id)
+    @friendships = Friendship.all
+    # @friendships = Friendship.where(status: 'accepted', reciever_id: @user.id)
     render json: {Friends: @friendships}
   end
 
@@ -50,16 +63,36 @@ class FriendshipsController < ApplicationController
     end
   end
 
+  def block 
+    @blocker = @current_user 
+    @getting_blocked = params[:block]
+    @friendship1 = Friendship.find(sender_id: @blocker, reciever_id: @getting_blocked)
+    @friendship2 = Friendship.find(sender_id: @getting_blocked, reciever_id: @getting_blocked)
+
+    if @friendship1 
+      @friendship1.destroy 
+    end
+
+    if @friedndship2
+      @friendship2.destroy 
+    end
+
+
+  end
+
   def decline
     @user = @current_user 
     @sender = User.find(params[:to_decline])
-    @friendship = Friendship.find_by(sender_id: @sender.id)
-    @notifications = Notification.find_by(reciever_id: @user.id)
-    @notification.destroy
-    if @friendship.destroy
-      render json: {message: "Friend request declined"}
-    else 
-      render json: {message: "Friend request not declined"}
+    @friendship = Friendship.find_by(sender_id: @sender.id, reciever_id: @user.id)
+    if @friendship.update(status: 'declined')
+      @notification = Notification.find_by(reciever_id: @user.id)
+      if @notification.destroy
+        render json: {message: "Friend request declined, notification deleted.", friendship: @friendship}
+      else 
+        render json: {message: "Notofication not deleted"}
+      end
+    else
+      render json: {message: 'Friendship not declined.'}
     end
   end
 

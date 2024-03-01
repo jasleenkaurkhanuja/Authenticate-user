@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_02_28_111413) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_01_113012) do
   create_table "comments", force: :cascade do |t|
     t.text "description"
     t.integer "user_id", null: false
@@ -66,6 +66,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_02_28_111413) do
     t.string "otp"
     t.string "verification", default: "false"
     t.string "token"
+    t.boolean "blocked", default: false
   end
 
   add_foreign_key "comments", "posts"
