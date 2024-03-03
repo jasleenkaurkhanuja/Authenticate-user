@@ -27,14 +27,14 @@ This is an API-only social media application, where following tasks could be per
   * [x] 2.2 Forgot password controller => Action1 - for sending OTP on email, Action2 - for verifying OTP and resetting the password
 
 * [x] 3. Account update using authorisation token 
-  * [ ] 3.1 Refresh token concept incase of token gets expire (learn and implement)
+  * [x] 3.1 Refresh token concept incase of token gets expire (learn and implement)
 * [x] 4. Create, update and delete Post  
   * [ ] 4.1 Read all post and add pagination  
   * [x] 4.2  Comments (CRUD) on post
   * [x] 4.3 Like and unlike  on Posts and comments (use polymorphic association)
   * [x] 4.4 seprate api for getting all likes on post and comments 
 * [x] 5. Add friends - request would be in pending, accepted and decline
-  * [ ] 5.1  if decline can send friend request again after 30days
+  * [x] 5.1  if decline can send friend request again after 30days
   * [ ] 5.2 Block user and remove from friend list. so after unblocking also user will not be in his friend list.
 * [x] 6. Make post public, private and only_friends
 * [ ] 7. Share post( public and  only_friend only)
