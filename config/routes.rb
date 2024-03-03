@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+
   post '/verify', to:'users#verify'
   post '/forgot_password', to: 'passwords#forgot'
   post '/reset', to: 'passwords#reset'
@@ -11,7 +12,7 @@ Rails.application.routes.draw do
   # post '/forgot-password', to: 'users#forgot_password'
   # get 'friendships/update'
   ## shows all the posts of all the users
-  get '/post_index', to:'posts#index'
+  get '/post_index/:page', to:'posts#index'
 
   ## creates a post 
   post '/create', to:'posts#create'

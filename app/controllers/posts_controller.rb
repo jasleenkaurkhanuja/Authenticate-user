@@ -1,25 +1,12 @@
 class PostsController < ApplicationController
   def index 
     @user = @current_user
-    @posts = []
   
-    @posts += Post.where(permission: 'everyone')
-  
-    Post.where(permission: 'my_friends').select do |post|
-      @u = User.find(post.user_id)
-      @friend = Friendship.find_by(sender_id: @user.id, reciever_id: @u.id)
-      if @friend
-        @posts << post
-      end
-    end
+    @people_user_is_following = @user.sent_friendships.pluck(:reciever_id)
 
-    Post.where(permission: 'only_me').select do |post|
-      @u = User.find(post.user_id)
-      if @u == @user
-        @posts << post
-      end
-    end
-    render json: { posts: @posts }
+    @posts = Post.where(permission: 'everyone').or(Post.where(user_id: @people_user_is_following, permission:'my_friends')).or(Post.where(user_id: @user.id)).order(created_at: :desc).page(params[:page]).per(5)
+  
+    render json: { posts: @posts, people_user_is_following: @people_user_is_following }
   end
   
 

@@ -44,7 +44,7 @@ class UsersController < ApplicationController
     elsif @user && @user.authenticate(params[:user][:password])
       access_token = JsonWebToken.encode(user_id: @user.id)
       refresh_token = JsonWebToken.encode(user_id: @user.id, exp: 6.months.from_now)
-      render json: {name: @user.name, access_token:token, refresh_token}
+      render json: {name: @user.name, access_token:access_token, refresh_token:refresh_token}
     else 
       render json: {error: @user.errors.full_messages}, status: :unprocessable_entity 
     end
