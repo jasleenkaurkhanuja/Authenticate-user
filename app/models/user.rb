@@ -4,6 +4,9 @@ class User < ApplicationRecord
     has_many :likes, dependent: :destroy
     has_many :comments, dependent: :destroy
 
+    has_many :blocker, class_name: 'Block', foreign_key: 'blocker_id', dependent: :destroy  
+    has_many :blocked, class_name: 'Block', foreign_key: 'blocked_id', dependent: :destroy 
+
     has_many :sent_friendships, class_name: 'Friendship', foreign_key: 'sender_id', dependent: :destroy
     has_many :recieved_friendships, class_name: 'Friendship', foreign_key: 'reciever_id', dependent: :destroy
 

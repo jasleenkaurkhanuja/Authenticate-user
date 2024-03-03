@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_03_01_113012) do
+ActiveRecord::Schema[7.1].define(version: 2024_03_03_141512) do
+  create_table "blocks", force: :cascade do |t|
+    t.integer "blocker_id"
+    t.integer "blocked_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "comments", force: :cascade do |t|
     t.text "description"
     t.integer "user_id", null: false
@@ -69,6 +76,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_03_01_113012) do
     t.boolean "blocked", default: false
   end
 
+  add_foreign_key "blocks", "users", column: "blocked_id"
+  add_foreign_key "blocks", "users", column: "blocker_id"
   add_foreign_key "comments", "posts"
   add_foreign_key "comments", "users"
   add_foreign_key "friendships", "users", column: "reciever_id"

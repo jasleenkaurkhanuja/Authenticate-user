@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get '/blocks', to: 'blocks#index'
+  post '/block/:to_be_blocked', to: 'blocks#block'
+  post '/unblock/:id', to: 'blocks#unblock'
 
 
   post '/verify', to:'users#verify'
@@ -8,7 +11,7 @@ Rails.application.routes.draw do
   post "/create_friend", to:'friendships#create'
   post "/accept/:to_accept", to:'friendships#accept'
   post '/decline/:to_decline', to:'friendships#decline'
-  get 'friendlist', to: 'friendships#friends'
+  get '/friendlist', to: 'friendships#friends'
   # post '/forgot-password', to: 'users#forgot_password'
   # get 'friendships/update'
   ## shows all the posts of all the users

@@ -63,22 +63,6 @@ class FriendshipsController < ApplicationController
     end
   end
 
-  def block 
-    @blocker = @current_user 
-    @getting_blocked = params[:block]
-    @friendship1 = Friendship.find(sender_id: @blocker, reciever_id: @getting_blocked)
-    @friendship2 = Friendship.find(sender_id: @getting_blocked, reciever_id: @getting_blocked)
-
-    if @friendship1 
-      @friendship1.destroy 
-    end
-
-    if @friedndship2
-      @friendship2.destroy 
-    end
-
-
-  end
 
   def decline
     @user = @current_user 
