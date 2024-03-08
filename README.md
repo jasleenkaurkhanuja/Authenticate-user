@@ -39,7 +39,11 @@ This is an API-only social media application, where following tasks could be per
 * [x] 6. Make post public, private and only_friends
 * [x] 7. Share post( public and  only_friend only)
   * [x] 7.1 if share post of friend , after unfriend share post should be removed. Or can set set the status of shared post deactivated so that when they become friend again shared post can be visible in his profile. This happens in linkedin if we add some skills and people endorse on that skill. after endorsing we remove it and add again then people who have endorse on that skill will still be visible
+<<<<<<< HEAD
 * [x] 8. we can attach the profile_pic and cover_pic with account
+=======
+* [ ] 8. we can attach the profile_pic and cover_pic with account
+>>>>>>> 7b2325eb3559adeca3eb6f9b68c0579ab2286d0f
   * [ ] 8.1 we can attach image/images with post and comments
   * [ ] 8.2 we add reaction instead of likes like fb,linkedin,etc do 
 * [ ] 9. Report user - if more than 100 user reported him then account will be blocked
