@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  get 'shares/index'
+  post '/share/:post_id', to:'shares#create'
+  get 'shares/delete'
   get '/blocks', to: 'blocks#index'
   post '/block/:to_be_blocked', to: 'blocks#block'
   post '/unblock/:id', to: 'blocks#unblock'

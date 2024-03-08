@@ -1,14 +1,19 @@
 class PostsController < ApplicationController
   def index 
     @user = @current_user
-  
+    @posts = []
     @blocked = Block.where(blocked_id: @user.id).pluck(:blocker_id) + Block.where(blocker_id: @user.id).pluck(:blocked_id)
 
     @people_user_is_following =  @user.sent_friendships.where(status: 'accepted').pluck(:reciever_id)
 
-    @posts = Post.where(permission: 'everyone').where.not(user_id: @blocked).or(Post.where(user_id: @people_user_is_following, permission:'my_friends')).or(Post.where(user_id: @user.id)).order(created_at: :desc).page(params[:page])
+    @posts += Post.where(permission: 'everyone').where.not(user_id: @blocked).or(Post.where(user_id: @people_user_is_following, permission:'my_friends')).or(Post.where(user_id: @user.id)).order(created_at: :desc).page(params[:page])
   
-    render json: { posts: @posts, people_user_is_following: @people_user_is_following }
+    @shared_id = Share.where(user_id: @user.id, status: 'active').where.not(user_id: @blocked).pluck(:post_id)
+    @shared = Post.where(id: @shared_id) 
+    @posts += @shared 
+    
+    
+    render json: { posts: @posts, people_user_is_following: @people_user_is_following, shared: @shared }
   end
   
 

@@ -28,6 +28,8 @@ class FriendshipsController < ApplicationController
           render json: {message: "Friend request not sent"}
         end
       end
+    elsif @user.blocker.find_by(blocked_id: @friend.id) || @frind.blocked.find_by(blocker_id: @user.id)
+      render json: {message: "Friend request cannot be sent"}
     else
       @friendship = Friendship.create(sender_id: @current_user.id, reciever_id: @friend.id, status:'pending')
       @notification = Notification.create(sender_id: @current_user.id, reciever_id: @friend.id)
@@ -52,6 +54,20 @@ class FriendshipsController < ApplicationController
     @user = @current_user 
     @sender = User.find(params[:to_accept])
     @friendship = Friendship.find_by(sender_id: @sender.id, reciever_id: @user.id)
+
+    @shared1 = Share.where(user_id: @user.id, original_id: @sender.id)
+    @shared2 = Share.where(user_id: @sender.id, original_id: @user.id)
+
+    if @shared1.any? 
+      @shared1.each do |post|
+      post.update(status: 'active')
+    end
+
+    if @shared2.any? 
+      @shared2.each do |post|
+      post.update(status: 'active')
+    end
+
     @friendship.status = "accepted"
     @notification = Notification.find_by(reciever_id: @user.id)
     

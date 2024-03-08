@@ -4,6 +4,9 @@ class User < ApplicationRecord
     has_many :likes, dependent: :destroy
     has_many :comments, dependent: :destroy
 
+    has_many :sharer, class_name: 'Share', foreign_key: 'user_id', dependent: :destroy
+    has_many :original, class_name: 'Share', foreign_key: 'original_id', dependent: :destroy
+
     has_many :blocker, class_name: 'Block', foreign_key: 'blocker_id', dependent: :destroy  
     has_many :blocked, class_name: 'Block', foreign_key: 'blocked_id', dependent: :destroy 
 
