@@ -1,3 +1,4 @@
+
 class UsersController < ApplicationController
   skip_before_action :authenticate_user, only:[:login, :signup, :index, :verify]
   def index
@@ -71,10 +72,46 @@ end
 
   def update
     @user = @current_user 
+    
+    # if params[:profile_picture].present? 
+    #   begin
+    #     upload_result = Cloudinary::Uploader.upload(params[:profile_picture])
+    #     @user.profile_picture = upload_result['secure_url']
+    #   rescue => e
+    #     puts "Error uploading profile picture: #{e.message}"
+    #   end
+    # end
+
+    # if params[:cover_picture].present?
+    #   begin
+    #     upload_result = Cloudinary::Uploader.upload(params[:cover_picture])
+    #     byebug
+    #     @user.cover_picture = upload_result['secure_url']
+    #   rescue => e
+    #     puts "Error uploading cover picture: #{e.message}"
+    #   end
+    # end
+    
+
+    # if @user.update(user_params)
+    #   render json:{user:@user, message:"User updated Successfully", profile_picture: @user.profile_picture, cover_picture: @user.cover_picture}
+    # else 
+    #   render json:{error:@user.errors.full_messages}, status: :unprocessable_entity
+    # end
+
     if @user.update(user_params)
-      render json:{user:@user, message:"User updated Successfully"}
-    else 
-      render json:{error:@user.errors.full_messages}, status: :unprocessable_entity
+      # byebug
+      if params[:profile_picture].present?
+        @user.profile_picture = Cloudinary::Uploader.upload(params[:profile_picture])['secure_url']
+      end
+  
+      if params[:cover_picture].present?
+        @user.cover_picture = Cloudinary::Uploader.upload(params[:cover_picture])['secure_url']
+      end
+      @user.save
+      render json: @user, status: :ok
+    else
+      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
 
   end
@@ -96,6 +133,6 @@ end
 
 private 
   def user_params 
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :phone)
+    params.permit(:name, :email, :password, :password_confirmation, :phone, :profile_picture, :cover_picture)
   end
 end
