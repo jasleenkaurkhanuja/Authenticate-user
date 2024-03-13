@@ -1,11 +1,17 @@
 source "https://rubygems.org"
 
 ruby "3.3.0"
-
+gem 'rack-test'
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 7.1.3"
-gem 'sidekiq'
+# gem 'sidekiq'
 gem 'ffi'
+gem 'simplecov'
+# gem 'sidekiq-activerecord'
+gem 'rspec-rails'
+gem 'faker'
+gem 'factory_bot_rails'
+
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"

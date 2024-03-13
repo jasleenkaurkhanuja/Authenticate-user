@@ -48,6 +48,7 @@ Rails.application.routes.draw do
   patch '/update', to:'users#update'
   get '/show', to:'users#show'
   delete '/delete', to:'users#delete'
+  post '/refresh', to: 'users#refresh'
 
 
 

@@ -1,6 +1,6 @@
 
 class UsersController < ApplicationController
-  skip_before_action :authenticate_user, only:[:login, :signup, :index, :verify]
+  skip_before_action :authenticate_user, only:[:login, :signup, :index, :verify, :refresh]
   def index
     @users = User.all
     render json: @users
@@ -16,50 +16,55 @@ class UsersController < ApplicationController
       UserMailer.with(user: @user, verification_url: verification_url).account_verification.deliver_now
       render json: {name: @user.name, email: @user.email}, status: :created 
     else
-      render json: @user.errors.full_messages, status: :unprocessable_entity
+      render json: {error: @user.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
   def verify
     @token = params[:token]
     @decoded = JsonWebToken.decode(@token)
-    byebug
+    # byebug
     if @decoded.present? && @decoded.key?("user_id")
       @user = User.find(@decoded["user_id"])
       if @user
         @user.update(verification: 'true')
-        render json: {message: "Account verified successfully"}
+        render json: {message: "Account verified successfully", user:@user}
       else 
-        render json: {message: "Account not verified", error: @user.errors.full_messages}
+        render json: {message: "Account not verified"}
       end
     else 
       render json: {message: "decoded not present"}
     end
-
   end
 
   def login
-    @user = User.find_by_email(params[:user][:email])
+    @user = User.find_by_email(params[:email])
     if @user.verification == 'false'
-      render json: {message: 'Account not verified, please check your email for the verfication'}
-    elsif @user && @user.authenticate(params[:user][:password])
+      render json: {message: 'Account not verified, please check your email for the verfication'}, status: :unprocessable_entity
+    elsif @user && @user.authenticate(params[:password])
       access_token = JsonWebToken.encode(user_id: @user.id)
       refresh_token = JsonWebToken.encode(user_id: @user.id, exp: 6.months.from_now)
-      render json: {name: @user.name, access_token:access_token, refresh_token:refresh_token}
+      render json: {name: @user.name, access_token: access_token, refresh_token: refresh_token, message: "user logged in successfully"}, status: :ok
     else 
-      render json: {error: @user.errors.full_messages}, status: :unprocessable_entity 
+      render json: {message:"Wrong password, or user does not exist",error: @user.errors.full_messages}, status: :unprocessable_entity 
     end
 end
 
 def refresh 
   @decoded_token = JsonWebToken.decode(params[:refresh_token])
-  if @decode_token && @decoded_token["user_id"]
-    @user = User.find(@decode_token["user_id"])
-    if @decode_token["exp"] >= Time.now.to_i 
+  # byebug
+  if @decoded_token && @decoded_token["user_id"]
+    x = @decoded_token["user_id"]
+    @user = User.find(x)
+    # byebug
+    t = @decoded_token["exp"]
+    # byebug
+    if t >= Time.now.to_i
       @access_token = JsonWebToken.encode(user_id: @user.id)
-      render json: {message: "refresh token generated"}, status: :ok 
+      @user.update(token: @access_token)
+      render json: {message: "New access token generated"}, status: :ok 
     else 
-      render json: {message: "refresh_token expired"}, status: :unprocessable_entity
+      render json: {message: "Refresh token expired"}, status: :unprocessable_entity
     end
   else 
     render json: {message: "Invalid refresh token"}, status: :unprocessable_entity
@@ -72,32 +77,6 @@ end
 
   def update
     @user = @current_user 
-    
-    # if params[:profile_picture].present? 
-    #   begin
-    #     upload_result = Cloudinary::Uploader.upload(params[:profile_picture])
-    #     @user.profile_picture = upload_result['secure_url']
-    #   rescue => e
-    #     puts "Error uploading profile picture: #{e.message}"
-    #   end
-    # end
-
-    # if params[:cover_picture].present?
-    #   begin
-    #     upload_result = Cloudinary::Uploader.upload(params[:cover_picture])
-    #     byebug
-    #     @user.cover_picture = upload_result['secure_url']
-    #   rescue => e
-    #     puts "Error uploading cover picture: #{e.message}"
-    #   end
-    # end
-    
-
-    # if @user.update(user_params)
-    #   render json:{user:@user, message:"User updated Successfully", profile_picture: @user.profile_picture, cover_picture: @user.cover_picture}
-    # else 
-    #   render json:{error:@user.errors.full_messages}, status: :unprocessable_entity
-    # end
 
     if @user.update(user_params)
       # byebug
@@ -113,7 +92,6 @@ end
     else
       render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
     end
-
   end
 
   def show
