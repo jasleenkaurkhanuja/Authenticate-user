@@ -22,20 +22,23 @@ class UsersController < ApplicationController
 
   def verify
     @token = params[:token]
-    @decoded = JsonWebToken.decode(@token)
-    # byebug
-    if @decoded.present? && @decoded.key?("user_id")
-      @user = User.find(@decoded["user_id"])
-      if @user
-        @user.update(verification: 'true')
-        render json: {message: "Account verified successfully", user:@user}
-      else 
-        render json: {message: "Account not verified"}
-      end
-    else 
-      render json: {message: "decoded not present"}
+  
+    begin
+      @decoded = JsonWebToken.decode(@token)
+    rescue JWT::DecodeError => e
+      render json: { message: 'Invalid token' }, status: :unprocessable_entity
+      return
     end
+    begin
+      @user = User.find(@decoded["user_id"])
+    rescue ActiveRecord::RecordNotFound => e
+      render json: {message: "Entity not found"}
+      return
+    end
+    @user.update(verification: 'true')
+    render json: { message: "Account verified successfully", user: @user }
   end
+  
 
   def login
     @user = User.find_by_email(params[:email])
@@ -48,27 +51,22 @@ class UsersController < ApplicationController
     else 
       render json: {message:"Wrong password, or user does not exist",error: @user.errors.full_messages}, status: :unprocessable_entity 
     end
-end
+  end
 
 def refresh 
-  @decoded_token = JsonWebToken.decode(params[:refresh_token])
-  # byebug
-  if @decoded_token && @decoded_token["user_id"]
+  @token = params[:refresh_token]
+  begin
+    @decoded_token = JsonWebToken.decode(@token)
+  rescue JWT::DecodeError => e
+    puts e
+    render json: { message: 'Invalid refresh token or the refresh token is expired' }, status: :unprocessable_entity
+    return
+  end
     x = @decoded_token["user_id"]
     @user = User.find(x)
-    # byebug
-    t = @decoded_token["exp"]
-    # byebug
-    if t >= Time.now.to_i
-      @access_token = JsonWebToken.encode(user_id: @user.id)
-      @user.update(token: @access_token)
-      render json: {message: "New access token generated"}, status: :ok 
-    else 
-      render json: {message: "Refresh token expired"}, status: :unprocessable_entity
-    end
-  else 
-    render json: {message: "Invalid refresh token"}, status: :unprocessable_entity
-  end
+    @access_token = JsonWebToken.encode(user_id: @user.id)
+    @user.update(token: @access_token)
+    render json: {message: "New access token generated"}, status: :ok 
 end
 
   def logout
@@ -88,25 +86,22 @@ end
         @user.cover_picture = Cloudinary::Uploader.upload(params[:cover_picture])['secure_url']
       end
       @user.save
-      render json: @user, status: :ok
+      render json: {message:"User updates successfully", user: @user}, status: :ok
     else
-      render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+      render json: { message:"User does not exist", errors: @user.errors.full_messages }, status: :unauthorized
     end
   end
 
   def show
     @user = @current_user 
-    render json: {user: @user}
+    render json: {user: @user}, status: :ok
   end
 
 
   def delete 
     @user = @current_user 
-    if @user.destroy
-      render json: {message: "User is deleted"}
-    else 
-      render json: {meesage: "User not deleted"}
-    end
+    @user.destroy
+    render json: {message: "User is deleted"}
   end
 
 private 

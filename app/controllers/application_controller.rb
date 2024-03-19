@@ -1,5 +1,7 @@
 # require 'bcrypt'
 class ApplicationController < ActionController::Base
+    rescue_from ActiveRecord::RecordNotFound, with: :record_not_found
+
     protect_from_forgery with: :null_session
     skip_before_action :verify_authenticity_token
     # before_action :set_current_user
@@ -14,8 +16,11 @@ class ApplicationController < ActionController::Base
             # byebug
             # render json: {user: @current_user, token:token}
         else 
-            render json: {error: "Unauthorized user"}, status: :unprocessable_entity
+            render json: {error: "Unauthorized user"}, status: :unauthorized
         end
     end
-
+# private 
+    def record_not_found
+        render json: {message: "Entity not found"}, status: :not_found
+    end
 end

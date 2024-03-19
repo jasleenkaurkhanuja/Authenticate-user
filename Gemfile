@@ -11,6 +11,8 @@ gem 'simplecov'
 gem 'rspec-rails'
 gem 'faker'
 gem 'factory_bot_rails'
+gem 'rails-controller-testing'
+
 
 
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]

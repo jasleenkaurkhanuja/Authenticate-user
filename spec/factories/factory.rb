@@ -6,4 +6,10 @@ FactoryBot.define do
         password { 'Indore12345#' }
         phone { '7089332799' }
     end
+    factory :post do 
+        title {Faker::Lorem.sentence}
+        content {Faker::Lorem.paragraph}
+        permission {%w[only_me my_friends everyone].sample}
+        association :user
+    end
 end

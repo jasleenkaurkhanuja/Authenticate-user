@@ -34,6 +34,7 @@ Rails.application.routes.draw do
 
   ## shows the count and users who likes a specific post 
   get '/show_likes_post/:post_id', to:'posts#showlikesonpost'
+  get '/show_comments/:post_id', to: 'posts#showcomments'
 
   ## shows the count and users who likes a specific comment on a specific post
   get '/show_likes_comment/:post_id/:comment_id', to:'posts#showlikesoncomment'

@@ -13,7 +13,7 @@ class PostsController < ApplicationController
     @posts += @shared 
     
     
-    render json: { posts: @posts, people_user_is_following: @people_user_is_following, shared: @shared }
+    render json: { message: 'All posts',posts: @posts, people_user_is_following: @people_user_is_following, shared: @shared }, status: :ok
   end
   
 
@@ -21,16 +21,16 @@ class PostsController < ApplicationController
     @user = @current_user
     @post = @user.posts.create(post_params)
     if @post.save
-      render json: {Message: "Post saved successfully", post:@post}, status: :created 
+      render json: {message: "Post saved successfully", post:@post}, status: :created 
     else 
-      render json: {Message: "Post not saved", error: @post.errors.full_messages}, status: :unprocessable_entity
+      render json: {message: "Post not saved", error: @post.errors.full_messages}, status: :unprocessable_entity
     end
   end
 
   def show
     @user = @current_user 
     @posts = @user.posts.all 
-    render json:{user: @user.name, posts: @posts}
+    render json:{user: @user, posts: @posts}
   end
 
   def showlikesonpost
@@ -38,7 +38,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:post_id])
     likes_count = @post.likes.count 
     @likes = @post.likes.all
-    render json:{total_likes: likes_count, liked_by: @likes}
+    render json:{total_likes: likes_count, liked_by: @likes}, status: :ok
   end
 
   def showlikesoncomment
@@ -47,10 +47,15 @@ class PostsController < ApplicationController
     @comment = @post.comments.find(params[:comment_id])
     likes_count = @comment.likes.count 
     @likes = @comment.likes.all
-    render json:{total_likes: likes_count, liked_by: @likes}
+    render json:{total_likes: likes_count, liked_by: @likes}, status: :ok 
   end
 
   def showcomments
+    @user = @current_user
+    @post = Post.find(params[:post_id])
+    @comments = @post.comments.all 
+    @comment_count = @comments.count 
+    render json: {total_comments: @comment_count, comments: @comments}, status: :ok
   end
 
   def like_comment 
@@ -62,24 +67,26 @@ class PostsController < ApplicationController
     # byebug
     if @like.persisted?
       @like.destroy
-      render json:{message: "Like deleted from the comment"}
+      render json:{message: "Like deleted from the comment"}, status: :ok
     else 
       @like.save
-      render json:{message: "Like added to the comment"}
+      render json:{message: "Like added to the comment"}, status: :ok
     end
   end
 
   def like_post
     @user = @current_user 
-    @likeable = Post.find(params[:post_id])
-    @like = @likeable.likes.find_or_initialize_by(user_id: @user.id)
+    @post = Post.find(params[:post_id])
+    @like = @post.likes.find_or_initialize_by(user_id: @user.id)
     # byebug
     if @like.persisted?
       @like.destroy 
-      render json:{message: "Like deleted"}
+      total_likes = @post.likes.all
+      render json:{message: "Like deleted", total_likes: total_likes.count}, status: :ok
     else 
       @like.save 
-      render json:{message: "Like saved"}
+      total_likes = @post.likes.all
+      render json:{message: "Like saved", total_likes: total_likes.count}, status: :ok
     end
   end
 
@@ -88,12 +95,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:post_id])
     @comment = @post.comments.create(comment_params)
     @comment.user_id = @user.id 
-
-    if @comment.save
-      render json: {message: "Comment added successfully", description: @comment.description, id: @comment.id}
-    else 
-      render json: {message: "Comment not added", error: @comment.errors.full_messages}
-    end
+    render json: {message: "Comment added successfully", description: @comment.description, id: @comment.id}, status: :created
   end
 
 private 
