@@ -76,7 +76,7 @@ RSpec.describe "User", type: :request do
             end
 
             it 'returns correct number of users and a success http status' do 
-                expect(json.size).to eq(20)
+                expect(json.size).to eq(30)
                 expect(response).to have_http_status(:success)
             end
         end

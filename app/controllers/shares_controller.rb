@@ -13,7 +13,6 @@ class SharesController < ApplicationController
     # @b2 = Block.find_by(blocker_id: @original_id, blocked_id: @user.id)
 
     @friends = Friendship.where(sender_id: @user.id, reciever_id: @original_id, status: 'accepted')
-    byebug
     if @post.permission != 'everyone' || !@friends
       render json: {message: "Post could not be shared", permision: @post.permission, friends: @friends}
     else 
